@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { RefreshCw, Database, Search } from "lucide-react"
+import { RefreshCw, Database, Search, Download } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface IPAMPAValue {
@@ -66,6 +66,32 @@ export function IPAMPATable({ initialData }: IPAMPATableProps) {
     }
   }
 
+  const handleExport = () => {
+    try {
+      const queryParam = searchQuery.trim() ? `?q=${encodeURIComponent(searchQuery.trim())}` : ""
+      const url = `/api/ipampa/export${queryParam}`
+      
+      // Create a temporary anchor element and trigger download
+      const link = document.createElement("a")
+      link.href = url
+      link.download = `ipampa-export-${new Date().toISOString().split('T')[0]}.csv`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      toast({
+        title: "Export réussi",
+        description: "Les données ont été exportées en CSV",
+      })
+    } catch (error) {
+      toast({
+        title: "Erreur d'export",
+        description: "Impossible d'exporter les données",
+        variant: "destructive",
+      })
+    }
+  }
+
   // Filter data based on search query
   const filteredData = data.filter((index) => {
     if (!searchQuery.trim()) return true
@@ -95,10 +121,16 @@ export function IPAMPATable({ initialData }: IPAMPATableProps) {
             {filteredData.length} {filteredData.length !== data.length && `sur ${data.length} `} indices chargés depuis la base de données
           </p>
         </div>
-        <Button onClick={handleRefresh} disabled={isRefreshing} className="gap-2">
-          <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
-          {isRefreshing ? "Actualisation..." : "Actualiser les données"}
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={handleExport} variant="outline" className="gap-2">
+            <Download className="h-4 w-4" />
+            Exporter en CSV
+          </Button>
+          <Button onClick={handleRefresh} disabled={isRefreshing} className="gap-2">
+            <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+            {isRefreshing ? "Actualisation..." : "Actualiser les données"}
+          </Button>
+        </div>
       </div>
 
       <div className="relative">
