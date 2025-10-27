@@ -106,8 +106,10 @@ export async function POST() {
 
     console.log("[IPAMPA Refresh] Processing CSV records to extract indices...")
     
+    const ipampaRecords = records.filter(record => record['Libellé']?.includes('IPAMPA'))
+
     // Parse all data rows into arrays
-    for (const record of records) {
+    for (const record of ipampaRecords) {
       // Filter out null bytes from all values and get metadata
       const label = (record['Libellé'] || '').replace(/\0/g, '').trim()
       const idBank = (record['idBank'] || '').replace(/\0/g, '').trim()
@@ -176,18 +178,20 @@ export async function POST() {
 
     console.log(`[IPAMPA Refresh] Collected ${valuesData.length} values, inserting into database...`)
 
-    // Batch insert all values at the end
-    let insertedCount = 0
-    for (const value of valuesData) {
+    // Batch insert all values using UNNEST
+    if (valuesData.length > 0) {
+      const indexIds = valuesData.map(d => d.index_id)
+      const years = valuesData.map(d => d.year)
+      const values = valuesData.map(d => d.value)
+      
       await sql`
         INSERT INTO ipampa_values (index_id, year, value)
-        VALUES (${value.index_id}, ${value.year}, ${value.value})
+        SELECT * FROM UNNEST(
+          ${indexIds}::integer[],
+          ${years}::integer[],
+          ${values}::numeric[]
+        )
       `
-      insertedCount++
-      
-      if (insertedCount % 1000 === 0) {
-        console.log(`[IPAMPA Refresh] Inserted ${insertedCount}/${valuesData.length} values`)
-      }
     }
 
     console.log(`[IPAMPA Refresh] Successfully inserted ${valuesData.length} values into database`)
