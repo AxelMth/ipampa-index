@@ -41,9 +41,9 @@ export default async function Home() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <TrendingUp className="h-8 w-8 text-primary" />
-            <h1 className="text-4xl font-bold tracking-tight">IPAMPA Index</h1>
+            <h1 className="text-4xl font-bold tracking-tight">Indice IPAMPA</h1>
           </div>
-          <p className="text-lg text-muted-foreground">Agricultural Production Price Index from INSEE</p>
+          <p className="text-lg text-muted-foreground">Indice des Prix à la Production de Matières Premières Agricoles de l'INSEE</p>
         </div>
 
         <IPAMPATable initialData={data} />

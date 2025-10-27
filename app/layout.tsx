@@ -9,8 +9,8 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "IPAMPA Index - INSEE Data",
-  description: "Agricultural Production Price Index from INSEE",
+  title: "Indice IPAMPA - Données INSEE",
+  description: "Indice des Prix à la Production de Matières Premières Agricoles de l'INSEE",
   generator: "v0.app",
 }
 

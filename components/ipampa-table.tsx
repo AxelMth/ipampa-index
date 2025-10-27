@@ -46,7 +46,7 @@ export function IPAMPATable({ initialData }: IPAMPATableProps) {
         if (dataResult.success) {
           setData(dataResult.data)
           toast({
-            title: "Data refreshed",
+            title: "Données actualisées",
             description: result.message,
           })
         }
@@ -55,8 +55,8 @@ export function IPAMPATable({ initialData }: IPAMPATableProps) {
       }
     } catch (error) {
       toast({
-        title: "Refresh failed",
-        description: error instanceof Error ? error.message : "Failed to refresh data",
+        title: "Échec de l'actualisation",
+        description: error instanceof Error ? error.message : "Échec de l'actualisation des données",
         variant: "destructive",
       })
     } finally {
@@ -77,11 +77,11 @@ export function IPAMPATable({ initialData }: IPAMPATableProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Database className="h-5 w-5 text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">{data.length} indices loaded from database</p>
+          <p className="text-sm text-muted-foreground">{data.length} indices chargés depuis la base de données</p>
         </div>
         <Button onClick={handleRefresh} disabled={isRefreshing} className="gap-2">
           <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
-          {isRefreshing ? "Refreshing..." : "Refresh Data"}
+          {isRefreshing ? "Actualisation..." : "Actualiser les données"}
         </Button>
       </div>
 
@@ -89,13 +89,13 @@ export function IPAMPATable({ initialData }: IPAMPATableProps) {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Database className="h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-lg font-medium mb-2">No data available</p>
+            <p className="text-lg font-medium mb-2">Aucune donnée disponible</p>
             <p className="text-sm text-muted-foreground mb-4">
-              Click the refresh button to load IPAMPA data from INSEE
+              Cliquez sur le bouton d'actualisation pour charger les données IPAMPA depuis l'INSEE
             </p>
             <Button onClick={handleRefresh} disabled={isRefreshing}>
               <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
-              Load Data
+              Charger les données
             </Button>
           </CardContent>
         </Card>
@@ -113,7 +113,7 @@ export function IPAMPATable({ initialData }: IPAMPATableProps) {
                 <CardHeader>
                   <CardTitle className="text-lg">{index.label}</CardTitle>
                   <CardDescription>
-                    ID: {index.id_bank} • Period: {index.period} • Last update: {index.last_update}
+                    ID : {index.id_bank} • Période : {index.period} • Dernière mise à jour : {index.last_update}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -121,7 +121,7 @@ export function IPAMPATable({ initialData }: IPAMPATableProps) {
                     <table className="w-full">
                       <thead>
                         <tr className="border-b">
-                          <th className="text-left py-2 px-4 font-medium text-sm text-muted-foreground">Year</th>
+                          <th className="text-left py-2 px-4 font-medium text-sm text-muted-foreground">Année</th>
                           {recentValues.map(({ year }) => (
                             <th key={year} className="text-right py-2 px-4 font-medium text-sm text-muted-foreground">
                               {year}
@@ -131,7 +131,7 @@ export function IPAMPATable({ initialData }: IPAMPATableProps) {
                       </thead>
                       <tbody>
                         <tr>
-                          <td className="py-2 px-4 font-medium text-sm">Index</td>
+                          <td className="py-2 px-4 font-medium text-sm">Indice</td>
                           {recentValues.map(({ year, value }) => (
                             <td key={year} className="text-right py-2 px-4 font-mono text-sm">
                               {value ? value.toFixed(2) : "-"}
