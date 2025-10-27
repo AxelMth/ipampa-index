@@ -3,7 +3,8 @@
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { RefreshCw, Database } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { RefreshCw, Database, Search } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface IPAMPAValue {
@@ -27,6 +28,7 @@ interface IPAMPATableProps {
 export function IPAMPATable({ initialData }: IPAMPATableProps) {
   const [data, setData] = useState<IPAMPAIndex[]>(initialData)
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
   const { toast } = useToast()
 
   const handleRefresh = async () => {
@@ -64,6 +66,18 @@ export function IPAMPATable({ initialData }: IPAMPATableProps) {
     }
   }
 
+  // Filter data based on search query
+  const filteredData = data.filter((index) => {
+    if (!searchQuery.trim()) return true
+    
+    const query = searchQuery.toLowerCase()
+    return (
+      index.label.toLowerCase().includes(query) ||
+      index.id_bank.toLowerCase().includes(query) ||
+      index.period.toLowerCase().includes(query)
+    )
+  })
+
   // Get all unique years from the data
   const allYears = Array.from(new Set(data.flatMap((index) => index.values?.map((v) => v.year) || []))).sort(
     (a, b) => a - b,
@@ -77,12 +91,25 @@ export function IPAMPATable({ initialData }: IPAMPATableProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Database className="h-5 w-5 text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">{data.length} indices chargés depuis la base de données</p>
+          <p className="text-sm text-muted-foreground">
+            {filteredData.length} {filteredData.length !== data.length && `sur ${data.length} `} indices chargés depuis la base de données
+          </p>
         </div>
         <Button onClick={handleRefresh} disabled={isRefreshing} className="gap-2">
           <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
           {isRefreshing ? "Actualisation..." : "Actualiser les données"}
         </Button>
+      </div>
+
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          type="text"
+          placeholder="Rechercher par nom, ID ou période..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-10"
+        />
       </div>
 
       {data.length === 0 ? (
@@ -99,9 +126,19 @@ export function IPAMPATable({ initialData }: IPAMPATableProps) {
             </Button>
           </CardContent>
         </Card>
+      ) : filteredData.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <Search className="h-12 w-12 text-muted-foreground mb-4" />
+            <p className="text-lg font-medium mb-2">Aucun résultat trouvé</p>
+            <p className="text-sm text-muted-foreground">
+              Aucun indice ne correspond à votre recherche "{searchQuery}"
+            </p>
+          </CardContent>
+        </Card>
       ) : (
         <div className="space-y-4">
-          {data.map((index) => {
+          {filteredData.map((index) => {
             const indexValues = index.values || []
             const recentValues = recentYears.map((year) => {
               const value = indexValues.find((v) => v.year === year)
